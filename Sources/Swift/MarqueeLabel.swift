@@ -98,6 +98,15 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
     open var animationCurve: UIViewAnimationCurve = .linear
     
     /**
+     A boolean property that sets whether the `MarqueeLabel` should scroll even if text fits bounds.
+
+     If this property is set to `true`, the `MarqueeLabel` will scroll even if its text fits bounds.
+
+     Defaults to `false`.
+     */
+    @IBInspectable open var alwaysScroll: Bool = false
+
+    /**
      A boolean property that sets whether the `MarqueeLabel` should behave like a normal `UILabel`.
      
      When set to `true` the `MarqueeLabel` will behave and look like a normal `UILabel`, and  will not begin any scrolling animations.
@@ -717,6 +726,14 @@ open class MarqueeLabel: UILabel, CAAnimationDelegate {
         // Calculate the expected size
         var expectedLabelSize = sublabel.sizeThatFits(maximumLabelSize)
         
+        if alwaysScroll {
+            // Expand the expected size to exceed the bounds limits to make it scrollable
+            let minimumLabelWidth = bounds.size.width + 1
+            if expectedLabelSize.width < minimumLabelWidth {
+                expectedLabelSize.width = minimumLabelWidth
+            }
+        }
+
         #if os(tvOS)
             // Sanitize width to 16384.0 (largest width a UILabel will draw on tvOS)
             expectedLabelSize.width = min(expectedLabelSize.width, 16384.0)
